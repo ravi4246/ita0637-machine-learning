@@ -1,0 +1,26 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.mixture import GaussianMixture
+np.random.seed(42)
+n_samples = 500
+shifted_gaussian = np.random.randn(n_samples, 2) + np.array([20, 20])
+stretched_gaussian = np.dot(np.random.randn(n_samples, 2), np.array([[0.6, -0.4], [-0.4, 0.6]])) + np.array([0, 0])
+normal_gaussian = np.random.randn(n_samples, 2) + np.array([-20, -20])
+X = np.vstack([shifted_gaussian, stretched_gaussian, normal_gaussian])
+plt.scatter(X[:, 0], X[:, 1], s=10)
+plt.title('Synthetic Dataset')
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.show()
+gmm = GaussianMixture(n_components=3, random_state=42)
+gmm.fit(X)
+labels = gmm.predict(X)
+plt.scatter(X[:, 0], X[:, 1], c=labels, s=10, cmap='viridis')
+plt.title('Clustering Results with EM Algorithm')
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.show()
+print("Means of the clusters:")
+print(gmm.means_)
+print("\nCovariances of the clusters:")
+print(gmm.covariances_)
