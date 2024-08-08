@@ -1,0 +1,51 @@
+import pandas as pd
+
+# Create the dataset
+data = {
+    "Origin": ["Japan", "Japan", "Japan", "USA", "Japan"],
+    "Manufacturer": ["Honda", "Toyota", "Toyota", "Chrysler", "Honda"],
+    "Color": ["Blue", "Green", "Blue", "Red", "White"],
+    "Decade": ["1980", "1970", "1990", "1980", "1980"],
+    "Type": ["Economy", "Sports", "Economy", "Economy", "Economy"],
+    "Example Type": ["Positive", "Negative", "Positive", "Negative", "Positive"]
+}
+
+df = pd.DataFrame(data)
+
+# Separate the attributes and the target attribute
+attributes = df.columns[:-1].tolist()
+examples = df.values.tolist()
+
+# Initialize the most specific and most general hypotheses
+specific_h = ['0'] * len(attributes)
+general_h = [['?' for _ in range(len(attributes))] for _ in range(len(attributes))]
+
+# Function to update the hypotheses
+def candidate_elimination(examples):
+    for example in examples:
+        if example[-1] == "Positive":
+            for i in range(len(attributes)):
+                if specific_h[i] == '0':
+                    specific_h[i] = example[i]
+                elif specific_h[i] != example[i]:
+                    specific_h[i] = '?'
+            for i in range(len(attributes)):
+                for j in range(len(attributes)):
+                    if general_h[i][j] != '?' and general_h[i][j] != example[i]:
+                        general_h[i][j] = '?'
+        elif example[-1] == "Negative":
+            for i in range(len(attributes)):
+                if specific_h[i] != example[i] and specific_h[i] != '?':
+                    general_h[i][i] = specific_h[i]
+                else:
+                    general_h[i][i] = '?'
+    return specific_h, general_h
+
+# Run the candidate elimination algorithm
+specific_h, general_h = candidate_elimination(examples)
+
+# Remove duplicate general hypotheses
+general_h = [list(set(h)) for h in general_h]
+
+print("Most specific hypothesis:", specific_h)
+print("Most general hypotheses:", general_h)
