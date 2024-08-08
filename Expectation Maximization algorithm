@@ -1,0 +1,42 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.mixture import GaussianMixture
+
+# Generate sample data
+np.random.seed(42)
+n_samples = 500
+
+# Generate random data points
+X = np.vstack([np.random.normal(loc, 0.5, n_samples) for loc in [1, 5]]).reshape(-1, 1)
+
+# Fit a Gaussian Mixture Model using EM algorithm
+gmm = GaussianMixture(n_components=2, max_iter=100, random_state=42)
+gmm.fit(X)
+
+# Predict the cluster for each sample
+labels = gmm.predict(X)
+probs = gmm.predict_proba(X)
+
+# Plot the results
+plt.figure(figsize=(10, 6))
+
+# Scatter plot of data points with cluster labels
+plt.scatter(X, np.zeros_like(X), c=labels, s=5, cmap='viridis')
+
+# Plot the Gaussian distributions
+x = np.linspace(-1, 7, 1000).reshape(-1, 1)
+logprob = gmm.score_samples(x)
+pdf = np.exp(logprob)
+plt.plot(x, pdf, '-k', label='Gaussian Mixture')
+
+plt.title("Gaussian Mixture Model (EM Algorithm)")
+plt.xlabel("Data points")
+plt.ylabel("Density")
+plt.legend()
+plt.show()
+
+# Print the parameters of the GMM
+print("\nMeans of the GMM components:")
+print(gmm.means_)
+print("\nCovariances of the GMM components:")
+print(gmm.covariances_)
