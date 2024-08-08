@@ -1,0 +1,67 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score
+import numpy as np
+
+# Create a sample dataset
+data = pd.DataFrame({
+    'battery_power': np.random.randint(500, 2000, 100),
+    'clock_speed': np.random.uniform(0.5, 3.0, 100),
+    'ram': np.random.randint(512, 4096, 100),
+    'mobile_wt': np.random.randint(80, 250, 100),
+    'price_range': np.random.randint(0, 4, 100)  # Assuming 4 price ranges: 0, 1, 2, 3
+})
+
+# a) Read the Mobile price dataset using the Pandas module
+# Already done as we created the DataFrame above
+
+# b) Print the 1st five rows
+print("First five rows of the dataset:")
+print(data.head())
+
+# c) Basic statistical computations on the data set or distribution of data
+print("\nBasic statistical computations:")
+print(data.describe())
+
+# d) The columns and their data types
+print("\nColumns and their data types:")
+print(data.dtypes)
+
+# e) Detects null values in the dataset. If there are any null values, replace them with the mode value
+print("\nChecking for null values:")
+print(data.isnull().sum())
+
+# Replace null values with mode (no nulls in this generated data)
+for column in data.columns:
+    if data[column].isnull().sum() > 0:
+        mode_value = data[column].mode()[0]
+        data[column].fillna(mode_value, inplace=True)
+
+print("\nNull values after replacement:")
+print(data.isnull().sum())
+
+# f) Explore the data set using heatmap
+plt.figure(figsize=(10, 6))
+sns.heatmap(data.corr(), annot=True, cmap='coolwarm')
+plt.title("Heatmap of Feature Correlations")
+plt.show()
+
+# g) Split the data into test and train
+X = data.drop('price_range', axis=1)  # Assuming 'price_range' is the target column
+y = data['price_range']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# h) Fit into the model Naive Bayes Classifier
+model = GaussianNB()
+model.fit(X_train, y_train)
+
+# i) Predict the model
+y_pred = model.predict(X_test)
+
+# j) Find the accuracy of the model
+accuracy = accuracy_score(y_test, y_pred)
+print("\nAccuracy of the Naive Bayes Classifier model:", accuracy)
